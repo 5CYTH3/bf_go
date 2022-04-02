@@ -14,8 +14,14 @@ func main() {
 }
 
 func ParseLine(lines []string) {
-	var out byte = 49
-	var pointer int64
+	var (
+		out     byte
+		pointer int64
+		isLoop  bool
+		loop_p  int64
+	)
+
+	loop_stack := make([]byte, 3000)
 	main := make([]byte, 3000)
 	for _, i := range lines {
 		lineArray := strings.Split(i, "")
@@ -30,19 +36,16 @@ func ParseLine(lines []string) {
 			case "-":
 				main[pointer]--
 			case "[":
-				if lineArray[i+1] == "-" {
-					for main[pointer] != 0 {
-						main[pointer]--
-					}
-				}
+
 			case "]":
+				loop_p = int64(loop_stack[len(loop_stack)-1])
+				loop_stack = loop_stack[:len(loop_stack)-1]
 			case ".":
 				out = main[pointer]
 				fmt.Printf("out: %c\n", out)
 			case ",":
 				reader := bufio.NewReader(os.Stdin)
 				b, _ := reader.ReadByte()
-
 				main[pointer] = b
 			}
 		}
